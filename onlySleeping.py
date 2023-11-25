@@ -42,7 +42,7 @@ ww = 480
 hh = 480
 
 
-sleep = 0
+
 drowsy = 0
 active = 0
 
@@ -67,7 +67,15 @@ c=0
 
 mp_holistic = mp.solutions.holistic
 holistic = mp_holistic.Holistic()
-number_of_faces=5
+
+
+qsize = 20
+num_queues = numberOfPerson
+
+# Create a list of PriorityQueue instances
+max_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
+min_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
+
 def compute(ptA,ptB):
     dist = math.sqrt((ptA[0]-ptB[0])**2+ (ptA[1]-ptB[1])**2)
     return dist
@@ -138,6 +146,58 @@ def yawn(g,h,i,j,k,l,m,n):
 cap = cv2.VideoCapture(0)
 
 
+numberOfPerson = 10
+mPointsList = [0]*numberOfPerson
+x1List = [0]*numberOfPerson
+y1List = [0]*numberOfPerson
+x2List = [0]*numberOfPerson
+y2List= [0]*numberOfPerson
+x3List= [0]*numberOfPerson
+y3List = [0]*numberOfPerson
+x4List= [0]*numberOfPerson
+y4List= [0]*numberOfPerson
+x5List= [0]*numberOfPerson
+y5List= [0]*numberOfPerson
+x6List= [0]*numberOfPerson
+y6List= [0]*numberOfPerson
+x7List= [0]*numberOfPerson
+y7List= [0]*numberOfPerson
+x8List= [0]*numberOfPerson
+y8List= [0]*numberOfPerson
+x9List= [0]*numberOfPerson
+y9List= [0]*numberOfPerson
+x10List= [0]*numberOfPerson
+y10List= [0]*numberOfPerson
+x11List= [0]*numberOfPerson
+y11List= [0]*numberOfPerson
+x12List= [0]*numberOfPerson
+y12List= [0]*numberOfPerson
+x13List= [0]*numberOfPerson
+y13List= [0]*numberOfPerson
+x14List= [0]*numberOfPerson
+y14List= [0]*numberOfPerson
+x15List= [0]*numberOfPerson
+y15List= [0]*numberOfPerson
+x16List= [0]*numberOfPerson
+y16List= [0]*numberOfPerson
+x17List= [0]*numberOfPerson
+y17List= [0]*numberOfPerson
+x18List= [0]*numberOfPerson
+y18List= [0]*numberOfPerson
+x19List= [0]*numberOfPerson
+y19List= [0]*numberOfPerson
+x20List= [0]*numberOfPerson
+y20List= [0]*numberOfPerson
+x21List= [0]*numberOfPerson
+y21List= [0]*numberOfPerson
+x22List= [0]*numberOfPerson
+y22List= [0]*numberOfPerson
+x23List= [0]*numberOfPerson
+y23List= [0]*numberOfPerson
+yawnGList = [0]*numberOfPerson
+
+left_blink = [0]*numberOfPerson
+sleep = [0]*numberOfPerson
 
 while cap.isOpened():
     
@@ -166,56 +226,8 @@ while cap.isOpened():
                 cv2.imshow('MediaPipe FaceMesh', frame)
                 if(results.multi_face_landmarks != None):
                     detected_face = len(results.multi_face_landmarks);
-                    numberOfPerson = 10
-                    mPointsList = [0]*numberOfPerson
-                    x1List = [0]*numberOfPerson
-                    y1List = [0]*numberOfPerson
-                    x2List = [0]*numberOfPerson
-                    y2List= [0]*numberOfPerson
-                    x3List= [0]*numberOfPerson
-                    y3List = [0]*numberOfPerson
-                    x4List= [0]*numberOfPerson
-                    y4List= [0]*numberOfPerson
-                    x5List= [0]*numberOfPerson
-                    y5List= [0]*numberOfPerson
-                    x6List= [0]*numberOfPerson
-                    y6List= [0]*numberOfPerson
-                    x7List= [0]*numberOfPerson
-                    y7List= [0]*numberOfPerson
-                    x8List= [0]*numberOfPerson
-                    y8List= [0]*numberOfPerson
-                    x9List= [0]*numberOfPerson
-                    y9List= [0]*numberOfPerson
-                    x10List= [0]*numberOfPerson
-                    y10List= [0]*numberOfPerson
-                    x11List= [0]*numberOfPerson
-                    y11List= [0]*numberOfPerson
-                    x12List= [0]*numberOfPerson
-                    y12List= [0]*numberOfPerson
-                    x13List= [0]*numberOfPerson
-                    y13List= [0]*numberOfPerson
-                    x14List= [0]*numberOfPerson
-                    y14List= [0]*numberOfPerson
-                    x15List= [0]*numberOfPerson
-                    y15List= [0]*numberOfPerson
-                    x16List= [0]*numberOfPerson
-                    y16List= [0]*numberOfPerson
-                    x17List= [0]*numberOfPerson
-                    y17List= [0]*numberOfPerson
-                    x18List= [0]*numberOfPerson
-                    y18List= [0]*numberOfPerson
-                    x19List= [0]*numberOfPerson
-                    y19List= [0]*numberOfPerson
-                    x20List= [0]*numberOfPerson
-                    y20List= [0]*numberOfPerson
-                    x21List= [0]*numberOfPerson
-                    y21List= [0]*numberOfPerson
-                    x22List= [0]*numberOfPerson
-                    y22List= [0]*numberOfPerson
-                    x23List= [0]*numberOfPerson
-                    y23List= [0]*numberOfPerson
-                    yawnGList = [0]*numberOfPerson
-
+                    
+                    
                     for person in range(detected_face):                        
                         mPointsList[person] = results.multi_face_landmarks[person].landmark
 
@@ -279,6 +291,74 @@ while cap.isOpened():
                         
                         else:
                             yawnCount[person]=0   
+                            
+                        
+                        
+                        ####### Heart Attack ########
+# =============================================================================
+#                         results1 = holistic.process(frame)
+#                         
+#                         if results1.pose_landmarks!=None:
+#                             print(results1)
+#                             #print(len(results1.pose_landmarks))
+#                             print("Holistic process", results1.pose_landmarks)
+#                         
+#                             points1 = results1.pose_landmarks.landmark
+#                             Lsx1= points1[11].x*wid/2 ##11: Left shoulder 20: Right index finger
+#                             Lsy1=points1[11].y*heigh
+#                             
+#                             Rix1= points1[20].x*wid/2 
+#                             Riy1=points1[20].y*heigh
+#                             
+#                             HA1 = compute((Lsx1,Lsy1),(Rix1,Riy1))
+#                             #print("HA1= " +str(HA1))
+#                        
+#                             if HA1 <150 :
+#                                 heart_attack1+=1
+#                                 
+#                                 i=0
+#                                 if(heart_attack1>8):
+#                                     #print("heart_attack1 = " + str( heart_attack1))
+#                                     i+=1
+#                                     #self.label1_3.setText("Heart Attack");
+#                                     cv2.putText(frame, "Heart Attack", (500,300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+#                                     cv2.imshow('MediaPipe FaceMesh', frame)
+#                                     
+#                                     #if i==1:
+#                                         #message = client.messages.create(to='+12028267898',from_="+19705358298",body=" Megan was distracted while driving")             
+#                             else:
+#                               heart_attack1=0
+# =============================================================================
+
+                        ###########SLeeping################
+                        left_val = blinked((x4List[person],y4List[person]),(x5List[person],y5List[person]), 
+                          (x6List[person],y6List[person]), (x7List[person],y7List[person]), (x8List[person],y8List[person]), (x9List[person],y9List[person]))
+                        max_queue[person].put(left_val)  # Use negative values for max priority queue
+                        min_queue[person].put(-left_val)
+                        # If the queues exceed their maximum size, remove the highest/lowest element
+                        if max_queue[person].qsize() >qsize :
+                            max_queue[person].get()
+                        if min_queue[person].qsize() > qsize:
+                            min_queue[person].get()        
+                        #right_val = blinked((x10[person],y10[person]),(x11[person],y11[person]), 
+                          #(x12[person],y12[person]), (x13[person],y13[person]), (x14[person],y14[person]), (x15[person],y15[person]))
+
+                        max_average = sum(list(max_queue[person].queue)) / max_queue[person].qsize() if max_queue[person].qsize() > 0 else 0
+                        min_average = -sum(list(min_queue[person].queue)) / min_queue[person].qsize() if min_queue[person].qsize() > 0 else 0
+                        threshhold=min_average+0.6*(max_average-min_average)
+                        left_blink[person]=detect(left_val, threshhold)
+
+                        if(left_blink[person]==0):
+                            sleep[person]+=1
+                            print(person," ",sleep[person])
+                            if(sleep[person]>48):
+                                status="SLEEPING !!!"
+                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (100*(person*1),150), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                cv2.imshow('MediaPipe FaceMesh', frame)
+                                color = (255,0,0)
+                        else:
+                            sleep[person] = 0
+
 
                         
                 if cv2.waitKey(1) & 0xFF == ord('q'):

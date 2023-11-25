@@ -376,6 +376,7 @@ while cap.isOpened():
                             min_queuee.append(-e)
                         #print('max')
                         #print(max_queue.queue)
+                        #print(type(max_queue.queue))
                         #print('min')
                         #print(min_queuee)  
                         
@@ -421,6 +422,7 @@ while cap.isOpened():
                           drowsy=0
                           active=0
                           i=0
+                          print(sleep)
                           if(sleep>48):
                                 i+=1
                                 status="SLEEPING !!!"
@@ -428,8 +430,8 @@ while cap.isOpened():
                                 
                                 #print(status)
                                 color = (255,0,0)
-                                #cv2.putText(image, status, (500,300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
-                                #cv2.imshow('MediaPipe FaceMesh', image)
+                                cv2.putText(frame, status, (500,300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                cv2.imshow('MediaPipe FaceMesh', frame)
                                 #if i==1:
                                    #message = client.messages.create(to='+12028267898',from_="+19705358298",body=" Megan  slept while driving")
                                 #message = client.messages.create(to='+12028267898',from_="+19705358298",body=" Megan  slept while driving")

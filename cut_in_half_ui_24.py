@@ -554,10 +554,13 @@ class CameraPreview(QMainWindow):
 
         if self.capture is not None:
             ret, frame = self.capture.read()
+            
+
             frame=cv2.flip(frame,-1)
             wid=720
             heigh=480
-            frame=cv2.resize(frame, (wid,heigh))
+            
+            #frame=cv2.resize(frame, (wid,heigh))
            
             if ret:
                 # Convert the OpenCV image to a QImage
