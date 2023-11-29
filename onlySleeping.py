@@ -75,6 +75,8 @@ num_queues = numberOfPerson
 # Create a list of PriorityQueue instances
 max_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
 min_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
+max_queue_right = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
+min_queue_right = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
 
 def compute(ptA,ptB):
     dist = math.sqrt((ptA[0]-ptB[0])**2+ (ptA[1]-ptB[1])**2)
@@ -197,7 +199,19 @@ y23List= [0]*numberOfPerson
 yawnGList = [0]*numberOfPerson
 
 left_blink = [0]*numberOfPerson
+right_blink = [0]*numberOfPerson
 sleep = [0]*numberOfPerson
+
+
+z1List = [0]*numberOfPerson
+z2List = [0]*numberOfPerson
+z3List = [0]*numberOfPerson
+
+centroidx = [[0] * numberOfPerson for _ in range(numberOfPerson)]
+centroidy = [[0] * numberOfPerson for _ in range(numberOfPerson)]
+centroidz = [[0] * numberOfPerson for _ in range(numberOfPerson)]
+sdvxlist = [[0] * numberOfPerson for _ in range(numberOfPerson)]
+sdvylist = [[0] * numberOfPerson for _ in range(numberOfPerson)]
 
 while cap.isOpened():
     
@@ -285,8 +299,8 @@ while cap.isOpened():
                         if (yawnGList[person] == 3):
                             yawnCount[person]+=1
                             if(yawnCount[person]>10):
-                                    print('Person'+ str(person+1) +'yawning')
-                                    cv2.putText(frame, "Person" + str(person+1) +"Yawning", (100*(person*1),150), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                    #print('Person'+ str(person+1) +'yawning')
+                                    cv2.putText(frame, "Person" + str(person+1) +"Yawning", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
                                     cv2.imshow('MediaPipe FaceMesh', frame)
                         
                         else:
@@ -333,13 +347,22 @@ while cap.isOpened():
                         ###########SLeeping################
                         left_val = blinked((x4List[person],y4List[person]),(x5List[person],y5List[person]), 
                           (x6List[person],y6List[person]), (x7List[person],y7List[person]), (x8List[person],y8List[person]), (x9List[person],y9List[person]))
+                        right_val = blinked((x10List[person],y10List[person]),(x11List[person],y11List[person]), 
+                            (x12List[person],y12List[person]), (x13List[person],y13List[person]), (x14List[person],y14List[person]), (x15List[person],y15List[person]))
                         max_queue[person].put(left_val)  # Use negative values for max priority queue
                         min_queue[person].put(-left_val)
+                        max_queue_right[person].put(right_val)
+                        min_queue_right[person].put(-right_val)
                         # If the queues exceed their maximum size, remove the highest/lowest element
                         if max_queue[person].qsize() >qsize :
                             max_queue[person].get()
                         if min_queue[person].qsize() > qsize:
-                            min_queue[person].get()        
+                            min_queue[person].get() 
+                            
+                        if max_queue_right[person].qsize() >qsize :
+                            max_queue_right[person].get()
+                        if min_queue_right[person].qsize() > qsize:
+                            min_queue_right[person].get()
                         #right_val = blinked((x10[person],y10[person]),(x11[person],y11[person]), 
                           #(x12[person],y12[person]), (x13[person],y13[person]), (x14[person],y14[person]), (x15[person],y15[person]))
 
@@ -347,17 +370,80 @@ while cap.isOpened():
                         min_average = -sum(list(min_queue[person].queue)) / min_queue[person].qsize() if min_queue[person].qsize() > 0 else 0
                         threshhold=min_average+0.6*(max_average-min_average)
                         left_blink[person]=detect(left_val, threshhold)
+                        
+                        max_average = sum(list(max_queue_right[person].queue)) / max_queue_right[person].qsize() if max_queue_right[person].qsize() > 0 else 0
+                        min_average = -sum(list(min_queue_right[person].queue)) / min_queue_right[person].qsize() if min_queue_right[person].qsize() > 0 else 0
+                        threshhold=min_average+0.6*(max_average-min_average)
+                        right_blink[person]=detect(right_val, threshhold)
+                        #print(left_blink[person], "   ", right_blink[person]);
 
-                        if(left_blink[person]==0):
+                        if(left_blink[person] == 0 and right_blink[person] == 0):
                             sleep[person]+=1
-                            print(person," ",sleep[person])
-                            if(sleep[person]>48):
+                            #print(person," ",sleep[person])
+                            if(sleep[person]>38):
                                 status="SLEEPING !!!"
-                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (100*(person*1),150), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
                                 cv2.imshow('MediaPipe FaceMesh', frame)
                                 color = (255,0,0)
                         else:
                             sleep[person] = 0
+                        
+                        
+                        
+                        ##########Exogenous Health Event##################
+                        z1List[person] = mPointsList[person][93].z*wid  ### considered the depth (### Done)
+                        z2List[person] = mPointsList[person][323].z*wid
+                        z3List[person] = mPointsList[person][4].z*wid
+                                                                
+                        centroid = [(x1List[person]+x2List[person]+x3List[person])/3, (y1List[person]+y2List[person]+y3List[person])/3, (z1List[person]+z2List[person]+z3List[person])/3]
+                        centroidx[person].append(centroid[0])
+                        centroidy[person].append(centroid[1])
+                        centroidz[person].append(centroid[2])
+                        frames_observed=20
+
+                                 
+                        if len(centroidx[person]) > frames_observed:
+                           centroidx[person].pop(0)
+                        sdx = st.stdev(centroidx[person])
+                               
+                    
+                        if len(centroidy[person]) > frames_observed:
+                           centroidy[person].pop(0)
+                        sdy = st.stdev(centroidy[person])
+                        sdvxlist[person].append(sdx)
+                        sdvylist[person].append(sdy)
+                       
+                       
+                        if len(sdvxlist[person])>30: #30 here reprents CA threshhold
+                           sdvxlist[person].pop(0)
+                        if len(sdvylist[person])>30: #30 here reprents CA threshhold
+                           sdvylist[person].pop(0)
+                       
+                        if len(centroidz[person]) > frames_observed:
+                           centroidz[person].pop(0)
+                        sdz = st.stdev(centroidz[person])
+                        if len(centroidx[person])>2:
+                            vx,vy,vz,v_magnitude   =velocities(centroidx[person],centroidy[person],centroidz[person],frames_observed)       
+                            signsx=[]
+                            for i,e in enumerate(vx):
+                                if i==0:
+                                    signsx.append(e)
+                                elif signsx[-1]*e<0 and abs(e)>400:
+                                    signsx.append(e)
+    
+                            signsy=[]
+                            for i,e in enumerate(vy):
+
+                                if i==0:
+                                    signsy.append(e)
+                                elif signsy[-1]*e<0 and abs(e)>400:
+                                    signsy.append(e)
+                            CA=max(len(signsx),len(signsy))
+                            #print(CA)
+                            if len(signsx)>=4 or len(signsy)>=4:
+                                cv2.putText(frame, "Person" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                cv2.imshow('MediaPipe FaceMesh', frame)
+                                #print('EXOGENEOUS HEALTH EVENT 111111111111111111111111111')
 
 
                         
