@@ -5,6 +5,22 @@ Created on Thu Nov 16 21:13:08 2023
 @author: Sajib
 """
 
+import tkinter as tk
+
+# Create a tkinter window
+root = tk.Tk()
+
+# Get the screen width and height
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# Close the tkinter window (optional)
+root.destroy()
+
+
+
+
+
 import statistics as st
 import queue
 
@@ -38,8 +54,8 @@ frame_id = 0
 
 mp_holistic = mp.solutions.holistic
 holistic = mp_holistic.Holistic(static_image_mode=False, min_tracking_confidence=0.5, min_detection_confidence=0.5, model_complexity=1, smooth_landmarks=True)
-ww = 480
-hh = 480
+ww = screen_width
+hh = screen_height
 
 
 
@@ -67,6 +83,7 @@ c=0
 
 mp_holistic = mp.solutions.holistic
 holistic = mp_holistic.Holistic()
+
 
 
 qsize = 20
@@ -206,6 +223,11 @@ sleep = [0]*numberOfPerson
 z1List = [0]*numberOfPerson
 z2List = [0]*numberOfPerson
 z3List = [0]*numberOfPerson
+textColorList = [()]*numberOfPerson
+for idx in range(numberOfPerson):
+    text_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    textColorList[idx]=text_color
+
 
 centroidx = [[0] * numberOfPerson for _ in range(numberOfPerson)]
 centroidy = [[0] * numberOfPerson for _ in range(numberOfPerson)]
@@ -221,8 +243,8 @@ while cap.isOpened():
             if not ret:
                 break
             #frame=cv2.flip(frame,-1)
-            wid=720
-            heigh=480
+            wid=screen_width
+            heigh=screen_height
             frame=cv2.resize(frame, (wid,heigh))
            
             if ret:
@@ -300,7 +322,8 @@ while cap.isOpened():
                             yawnCount[person]+=1
                             if(yawnCount[person]>10):
                                     #print('Person'+ str(person+1) +'yawning')
-                                    cv2.putText(frame, "Person" + str(person+1) +"Yawning", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                    text_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                                    cv2.putText(frame, "P-" + str(person+1) +": Yawning", (200*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
                                     cv2.imshow('MediaPipe FaceMesh', frame)
                         
                         else:
@@ -382,7 +405,8 @@ while cap.isOpened():
                             #print(person," ",sleep[person])
                             if(sleep[person]>38):
                                 status="SLEEPING !!!"
-                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                text_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (200*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
                                 cv2.imshow('MediaPipe FaceMesh', frame)
                                 color = (255,0,0)
                         else:
@@ -441,8 +465,8 @@ while cap.isOpened():
                             CA=max(len(signsx),len(signsy))
                             #print(CA)
                             if len(signsx)>=4 or len(signsy)>=4:
-                                cv2.putText(frame, "Person" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
-                                cv2.imshow('MediaPipe FaceMesh', frame)
+                                cv2.putText(frame, "Person" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
+                                #cv2.imshow('MediaPipe FaceMesh', frame)
                                 #print('EXOGENEOUS HEALTH EVENT 111111111111111111111111111')
 
 
