@@ -406,7 +406,7 @@ while cap.isOpened():
                             if(sleep[person]>38):
                                 status="SLEEPING !!!"
                                 text_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-                                cv2.putText(frame, "Person" + str(person+1) +"Sleeping", (200*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
+                                cv2.putText(frame, "P-" + str(person+1) +"Sleeping", (200*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
                                 cv2.imshow('MediaPipe FaceMesh', frame)
                                 color = (255,0,0)
                         else:
@@ -465,7 +465,7 @@ while cap.isOpened():
                             CA=max(len(signsx),len(signsy))
                             #print(CA)
                             if len(signsx)>=4 or len(signsy)>=4:
-                                cv2.putText(frame, "Person" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
+                                cv2.putText(frame, "P-" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),150+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
                                 #cv2.imshow('MediaPipe FaceMesh', frame)
                                 #print('EXOGENEOUS HEALTH EVENT 111111111111111111111111111')
 
