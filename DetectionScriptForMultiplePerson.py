@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 16 21:13:08 2023
+Created on Wed Dec 13 17:54:30 2023
 
 @author: Sajib
 """
+
 
 import tkinter as tk
 
@@ -17,7 +18,7 @@ screen_height = root.winfo_screenheight()
 # Close the tkinter window (optional)
 root.destroy()
 
-
+#As our system will be used in various device, it will resized by the height and width of user device
 
 
 
@@ -36,16 +37,14 @@ import mediapipe as mp
 import numpy as np
 mp_drawing = mp.solutions.drawing_utils
 
+
+#setting the maximum number of person is 10 , it can be changed
+numberOfPerson = 10
 # Initialize MediaPipe FaceMesh
 mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5,max_num_faces=5)
+face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5,max_num_faces=numberOfPerson)
 #################################
 
-numberOfPerson = 10;
-
-heart_attack1 = 0
-heart_attack2 = 0
-# Loading camera
 
 font = cv2.FONT_HERSHEY_PLAIN
 starting_time = time.time()
@@ -89,11 +88,14 @@ holistic = mp_holistic.Holistic()
 qsize = 20
 num_queues = numberOfPerson
 
-# Create a list of PriorityQueue instances
+#Maintaining queue for individual eye ratio
+
 max_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
 min_queue = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
 max_queue_right = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
 min_queue_right = [queue.PriorityQueue(maxsize=qsize+1) for _ in range(num_queues)]
+
+#Modularization
 
 def compute(ptA,ptB):
     dist = math.sqrt((ptA[0]-ptB[0])**2+ (ptA[1]-ptB[1])**2)
@@ -164,8 +166,9 @@ def yawn(g,h,i,j,k,l,m,n):
     
 cap = cv2.VideoCapture(0)
 
+#initilizing variables 
 
-numberOfPerson = 10
+
 mPointsList = [0]*numberOfPerson
 x1List = [0]*numberOfPerson
 y1List = [0]*numberOfPerson
@@ -224,10 +227,12 @@ z1List = [0]*numberOfPerson
 z2List = [0]*numberOfPerson
 z3List = [0]*numberOfPerson
 textColorList = [()]*numberOfPerson
+# Generating Color for each person
 for idx in range(numberOfPerson):
     text_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     textColorList[idx]=text_color
 
+#Variables related with Exogenous Health Event
 
 centroidx = [[0] * numberOfPerson for _ in range(numberOfPerson)]
 centroidy = [[0] * numberOfPerson for _ in range(numberOfPerson)]
@@ -258,7 +263,7 @@ while cap.isOpened():
                         mp_drawing.draw_landmarks(frame, landmarks, mp_face_mesh.FACEMESH_CONTOURS, 
                             landmark_drawing_spec=mp_drawing.DrawingSpec(color=(255, 255, 255, 150), thickness=1, circle_radius=1),
                             connection_drawing_spec=mp_drawing.DrawingSpec(color=(255, 255, 255,150), thickness=1))
-                        
+                #Showing the Facemesh
                 cv2.imshow('MediaPipe FaceMesh', frame)
                 if(results.multi_face_landmarks != None):
                     detected_face = len(results.multi_face_landmarks);
@@ -266,6 +271,8 @@ while cap.isOpened():
                     
                     for person in range(detected_face):                        
                         mPointsList[person] = results.multi_face_landmarks[person].landmark
+                        
+                        #Fetching Data From Face for All person in the frame
 
                         x1List[person] = mPointsList[person][93].x*wid
                         x2List[person] = mPointsList[person][323].x*wid
@@ -317,6 +324,8 @@ while cap.isOpened():
                         x23List[person] = mPointsList[person][19].x*wid
                         y23List[person] = mPointsList[person][19].y*heigh
                         
+                        #Detecting Yawn
+                        
                         yawnGList[person] = yawn((x16List[person],y16List[person]),(x17List[person],y17List[person]),(x18List[person],y18List[person]),(x19List[person],y19List[person]),(x20List[person],y20List[person]),(x21List[person],y21List[person]),(x22List[person],y22List[person]),(x23List[person],y23List[person]))
                         if (yawnGList[person] == 3):
                             yawnCount[person]+=1
@@ -332,42 +341,41 @@ while cap.isOpened():
                         
                         
                         ####### Heart Attack ########
-# =============================================================================
-#                         results1 = holistic.process(frame)
-#                         
-#                         if results1.pose_landmarks!=None:
-#                             print(results1)
-#                             #print(len(results1.pose_landmarks))
-#                             print("Holistic process", results1.pose_landmarks)
-#                         
-#                             points1 = results1.pose_landmarks.landmark
-#                             Lsx1= points1[11].x*wid/2 ##11: Left shoulder 20: Right index finger
-#                             Lsy1=points1[11].y*heigh
-#                             
-#                             Rix1= points1[20].x*wid/2 
-#                             Riy1=points1[20].y*heigh
-#                             
-#                             HA1 = compute((Lsx1,Lsy1),(Rix1,Riy1))
-#                             #print("HA1= " +str(HA1))
-#                        
-#                             if HA1 <150 :
-#                                 heart_attack1+=1
-#                                 
-#                                 i=0
-#                                 if(heart_attack1>8):
-#                                     #print("heart_attack1 = " + str( heart_attack1))
-#                                     i+=1
-#                                     #self.label1_3.setText("Heart Attack");
-#                                     cv2.putText(frame, "Heart Attack", (500,300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
-#                                     cv2.imshow('MediaPipe FaceMesh', frame)
-#                                     
-#                                     #if i==1:
-#                                         #message = client.messages.create(to='+12028267898',from_="+19705358298",body=" Megan was distracted while driving")             
-#                             else:
-#                               heart_attack1=0
-# =============================================================================
+                        results1 = holistic.process(frame)
+                        
+                        if results1.pose_landmarks!=None:
+                            print(results1)
+                            #print(len(results1.pose_landmarks))
+                            #print("Holistic process", results1.pose_landmarks)
+                        
+                            points1 = results1.pose_landmarks.landmark
+                            Lsx1= points1[11].x*wid/2 ##11: Left shoulder 20: Right index finger
+                            Lsy1=points1[11].y*heigh
+                            
+                            Rix1= points1[20].x*wid/2 
+                            Riy1=points1[20].y*heigh
+                            
+                            HA1 = compute((Lsx1,Lsy1),(Rix1,Riy1))
+                            #print("HA1= " +str(HA1))
+                       
+                            if HA1 <150 :
+                                heart_attack1+=1
+                                
+                                i=0
+                                if(heart_attack1>8):
+                                    #print("heart_attack1 = " + str( heart_attack1))
+                                    i+=1
+                                    #self.label1_3.setText("Heart Attack");
+                                    cv2.putText(frame, "Heart Attack", (500,300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255),3)
+                                    cv2.imshow('MediaPipe FaceMesh', frame)
+                                    
+                                    #if i==1:
+                                        #message = client.messages.create(to='+12028267898',from_="+19705358298",body=" Megan was distracted while driving")             
+                            else:
+                              heart_attack1=0
 
                         ###########SLeeping################
+                        
                         left_val = blinked((x4List[person],y4List[person]),(x5List[person],y5List[person]), 
                           (x6List[person],y6List[person]), (x7List[person],y7List[person]), (x8List[person],y8List[person]), (x9List[person],y9List[person]))
                         right_val = blinked((x10List[person],y10List[person]),(x11List[person],y11List[person]), 
@@ -469,7 +477,7 @@ while cap.isOpened():
                             if len(signsx)>=4 or len(signsy)>=4:
                                 cv2.putText(frame, "P-" + str(person+1) +"EXOGENEOUS HEALTH EVENT", (100*(person*1),190+(50*person)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, textColorList[person],3)
                                 cv2.imshow('MediaPipe FaceMesh', frame)
-                                print('EXOGENEOUS HEALTH EVENT 111111111111111111111111111')
+                                #print('EXOGENEOUS HEALTH EVENT 111111111111111111111111111')
 
 
                         
